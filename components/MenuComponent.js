@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {View, Platform, FlatList} from 'react-native'
 import {ListItem} from 'react-native-elements'
 import {DISHES} from '../shared/dishes'
-import Constants from 'expo-constants';
 class Menu extends Component{
     
     constructor(props){
@@ -12,11 +11,7 @@ class Menu extends Component{
         }
     }
 
-    static navigationOptions = {
-        title: 'Menu'
-    }
-
-    render(){
+     render(){
         const renderMenuItem = ({item, index}) => {
             return (
                 <ListItem
