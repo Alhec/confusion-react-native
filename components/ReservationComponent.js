@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button } from 'react-native';
+import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button,Modal } from 'react-native';
 import { Card } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { onChange } from 'react-native-reanimated';
@@ -12,42 +12,65 @@ class Reservation extends Component{
             smoking: false,
             date: new Date,
             mode:'date',
-            show:false
+            show:false,
+            showModal: false
         }
     }
-    handleReservation = ( selectedDate) => {
-      const currentDate = selectedDate || this.state.date;
-      console.log(JSON.stringify(this.state));
-      this.setState({
-          guests: 1,
-          smoking: false,
-          date: currentDate,
-          show:false
-      });
+  //   handleReservation = ( selectedDate) => {
+  //     const currentDate = selectedDate || this.state.date;
+  //     console.log(JSON.stringify(this.state));
+  //     this.setState({
+  //         guests: 1,
+  //         smoking: false,
+  //         date: currentDate,
+  //         show:false
+  //     });
+  // };
+
+  onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || this.state.date;
+    this.setState({
+      date: currentDate,
+      show:false
+    });
   };
-    render(){
 
-      const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || this.state.date;
-        this.setState({
-          date: currentDate,
-          show:false
-        });
-      };
+  
+   showDatepicker = () => {
+      this.setState({
+          show:true,
+          mode:"datetime"
+      })
+  };
 
-      const showDatepicker = () => {
-          this.setState({
-              show:true,
-              mode:"datetime"
-          })
-      };
+  
+   showTimepicker = () => {
+      this.setState({
+          show:true,
+          mode:"time"
+      })
+  };
 
-      const showTimepicker = () => {
-          this.setState({
-              show:true,
-              mode:"time"
-          })
-      };
+  toggleModal() {
+    this.setState({showModal: !this.state.showModal});
+}
+
+handleReservation() {
+    console.log(JSON.stringify(this.state));
+    this.toggleModal();
+}
+
+resetForm() {
+    this.setState({
+        guests: 1,
+          smoking: false,
+          date: new Date,
+          mode:'date',
+          show:false,
+          showModal: false
+    });
+}
+  render(){
       return (
         <ScrollView>
         <View style={styles.formRow}>
@@ -78,10 +101,10 @@ class Reservation extends Component{
                 <Text style={styles.formLabel}>Date and Time</Text>
                 <View>
                   <View>
-                    <Button color="#512DA8" onPress={showDatepicker} title={this.state.date.toDateString()} />
+                    <Button color="#512DA8" onPress={this.showDatepicker} title={this.state.date.toDateString()} />
                   </View>
                   <View>
-                    <Button color="#512DA8" onPress={showTimepicker} title={this.state.date.toTimeString()} />
+                    <Button color="#512DA8" onPress={this.showTimepicker} title={this.state.date.toTimeString()} />
                   </View>
                   {this.state.show && (
                     <DateTimePicker
@@ -99,7 +122,7 @@ class Reservation extends Component{
                   is24Hour={true}
                   minimumDate={new Date(2017, 1, 1)}
                   display="default"
-                      onChange={onChange}
+                      onChange={this.onChange}
                   />
                   )
                   }
@@ -113,6 +136,23 @@ class Reservation extends Component{
                     accessibilityLabel="Learn more about this purple button"
                     />
                 </View>
+                <Modal animationType = {"slide"} transparent = {false}
+                    visible = {this.state.showModal}
+                    onDismiss = {() => this.toggleModal() }
+                    onRequestClose = {() => this.toggleModal() }>
+                    <View style = {styles.modal}>
+                        <Text style = {styles.modalTitle}>Your Reservation</Text>
+                        <Text style = {styles.modalText}>Number of Guests: {this.state.guests}</Text>
+                        <Text style = {styles.modalText}>Smoking?: {this.state.smoking ? 'Yes' : 'No'}</Text>
+                        <Text style = {styles.modalText}>Date and Time: {this.state.date.toString()}</Text>
+                        
+                        <Button 
+                            onPress = {() =>{this.toggleModal(); this.resetForm();}}
+                            color="#512DA8"
+                            title="Close" 
+                            />
+                    </View>
+                </Modal>
         </ScrollView>
       );
     }
@@ -133,7 +173,23 @@ const styles = StyleSheet.create({
   },
   formItem: {
       flex: 1
-  }
+  },
+  modal: {
+    justifyContent: 'center',
+    margin: 20
+ },
+ modalTitle: {
+     fontSize: 24,
+     fontWeight: 'bold',
+     backgroundColor: '#512DA8',
+     textAlign: 'center',
+     color: 'white',
+     marginBottom: 20
+ },
+ modalText: {
+     fontSize: 18,
+     margin: 10
+ }
 });
 
 export default Reservation;
