@@ -70,13 +70,7 @@ function RenderComments(props) {
 }
 
 class Dishdetail extends Component{
-    constructor(props){
-        super(props);
-        this.state={
-            favorites: []
-        };
-    }
-    
+
     markFavorite(dishId) {
         this.props.postFavorite(dishId)
     }
@@ -84,7 +78,7 @@ class Dishdetail extends Component{
     render(){
         const {dishId} = this.props.route.params;
         return(
-            <FlatList 
+            <FlatList
             ListHeaderComponent={
                 <>
                     <RenderDish dish= {this.props.dishes.dishes[+dishId]}

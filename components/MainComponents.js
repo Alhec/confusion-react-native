@@ -12,6 +12,7 @@ import Contact from './ContactComponent';
 import About from './AboutComponent';
 import { connect } from 'react-redux';
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
+import Reservation from './ReservationComponent';
 
 const mapStateToProps = state => {
     return {
@@ -155,6 +156,34 @@ function AboutNavigator(){
     );
 }
 
+const StackReservation = createStackNavigator();
+
+function ReservationNavigator(){
+    return (
+        <StackReservation.Navigator
+            screenOptions={{
+            headerStyle: {
+                backgroundColor: '#512DA8',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                color:'#fff',
+            },
+            }}>
+            <StackReservation.Screen name="Reserve Table"
+            component={Reservation}
+            options={props =>{
+                    return {
+                        headerLeft: () =>(
+                        <Icon name="menu" size={24} color="white"
+                        onPress={()=> props.navigation.toggleDrawer()}/>
+                        )
+                    }
+                }}
+            />
+        </StackReservation.Navigator>
+    );
+}
 const CustomDrawerContentComponent = (props) => (
     <DrawerContentScrollView>
         <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
@@ -221,6 +250,17 @@ const Drawer = createDrawerNavigator()
                         drawerLabel:'Contact Us',
                         drawerIcon: ({ tintColor})=>(
                             <Icon name='address-card' type='font-awesome' size={22} color={tintColor}/>
+                        )
+                    }
+                }
+            />
+            <Drawer.Screen name="Reservation" component={ReservationNavigator}
+                options={
+                    {
+                        title:'Reservation Table',
+                        drawerLabel:'Reservation Table',
+                        drawerIcon: ({ tintColor})=>(
+                            <Icon name='cutlery' type='font-awesome' size={24} color={tintColor}/>
                         )
                     }
                 }
