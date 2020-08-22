@@ -13,6 +13,7 @@ import About from './AboutComponent';
 import { connect } from 'react-redux';
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
 import Reservation from './ReservationComponent';
+import Favorites from './FavoriteComponent';
 
 const mapStateToProps = state => {
     return {
@@ -184,6 +185,36 @@ function ReservationNavigator(){
         </StackReservation.Navigator>
     );
 }
+
+const StackFavorites = createStackNavigator();
+
+function FavoritesNavigator(){
+    return (
+        <StackFavorites.Navigator
+            screenOptions={{
+            headerStyle: {
+                backgroundColor: '#512DA8',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                color:'#fff',
+            },
+            }}>
+            <StackFavorites.Screen name="My Favorites"
+            component={Favorites}
+            options={props =>{
+                    return {
+                        headerLeft: () =>(
+                        <Icon name="menu" size={24} color="white"
+                        onPress={()=> props.navigation.toggleDrawer()}/>
+                        )
+                    }
+                }}
+            />
+        </StackFavorites.Navigator>
+    );
+}
+
 const CustomDrawerContentComponent = (props) => (
     <DrawerContentScrollView>
         <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
@@ -250,6 +281,17 @@ const Drawer = createDrawerNavigator()
                         drawerLabel:'Contact Us',
                         drawerIcon: ({ tintColor})=>(
                             <Icon name='address-card' type='font-awesome' size={22} color={tintColor}/>
+                        )
+                    }
+                }
+            />
+             <Drawer.Screen name="Favorites" component={FavoritesNavigator}
+                options={
+                    {
+                        title:'My Favorites ',
+                        drawerLabel:'My Favorites',
+                        drawerIcon: ({ tintColor})=>(
+                            <Icon name='heart' type='font-awesome' size={24} color={tintColor}/>
                         )
                     }
                 }
