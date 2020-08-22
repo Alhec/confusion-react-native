@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {View, Text, ScrollView, FlatList, Modal, StyleSheet, Button, TextInput} from 'react-native';
-import { Card, Icon, Rating} from 'react-native-elements';
+import {View, Text, ScrollView, FlatList, Modal, StyleSheet, Button, TextInput, Alert, PanResponder} from 'react-native';
+import { Card, Icon, Rating, Input} from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
 import { postFavorite, postComment } from '../redux/ActionCreators';
@@ -21,9 +21,36 @@ const mapDispatchToProps = dispatch => ({
 
 function RenderDish(props){
     const dish = props.dish;
+    const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
+        if ( dx < -200 )
+            return true;
+        else
+            return false;
+    }
+
+    const panResponder = PanResponder.create({
+        onStartShouldSetPanResponder: (e, gestureState) => {
+            return true;
+        },
+        onPanResponderEnd: (e, gestureState) => {
+            console.log("pan responder end", gestureState);
+            if (recognizeDrag(gestureState))
+                Alert.alert(
+                    'Add Favorite',
+                    'Are you sure you wish to add ' + dish.name + ' to favorite?',
+                    [
+                    {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                    {text: 'OK', onPress: () => {props.favorite ? console.log('Already favorite') : props.onPress()}},
+                    ],
+                    { cancelable: false }
+                );
+
+            return true;
+        }
+    })
     if(dish != null){
         return (
-            <Animatable.View animation="fadeInDown" duration={2000} delay={1000}>
+            <Animatable.View animation="fadeInDown" duration={2000} delay={1000} {...panResponder.panHandlers}>
             <Card
             featuredTitle={dish.name}
             image={{uri: baseUrl + dish.image}}>
@@ -140,27 +167,22 @@ class Dishdetail extends Component{
                     <View style = {styles.modal}>
                         <Rating showRating   ratingCount={5} startingValue={5} onFinishRating={(setRating)=> this.setState({rating:setRating})}  />
                         <View style={{flexDirection:'row', marginTop:20}}>
-                            <View>
-                                <Icon name='user-o' type='font-awesome' size={40} />
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <TextInput
-                                    style={{width:300, height: 40,borderBottomColor:'gray', borderColor:"#fff", borderWidth: 1 }}
-                                        placeholder="Author" onChangeText={text => this.setState({author:text})}
-                                    />
-                            </View>
+                            <Input
+                                placeholder="Author"
+                                onChangeText={text => this.setState({author:text})}
+                                leftIcon={
+                                    <Icon name='user-o' type='font-awesome' size={40} />
+                                }
+                            />
                         </View>
                         <View style={{flexDirection:'row', marginTop:20}}>
-                            <View>
-                                <Icon name='comment-o' type='font-awesome' size={40} />
-                            </View>
-                            <View style={{marginLeft: 10}}>
-                                <TextInput
-                                    style={{width:300, height: 40,borderBottomColor:'gray', borderColor:"#fff", borderWidth: 1 }}
-                                        placeholder="Comment" onChangeText={text => this.setState({comment:text})}
-
-                                    />
-                            </View>
+                            <Input
+                                placeholder="Comment" 
+                                onChangeText={text => this.setState({comment:text})}
+                                leftIcon={
+                                    <Icon name='comment-o' type='font-awesome' size={40} />
+                                }
+                            />
                         </View>
                         <View style={{marginTop:20}}>
                         <Button 
