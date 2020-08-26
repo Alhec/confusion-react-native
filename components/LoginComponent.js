@@ -18,7 +18,6 @@ class Login extends Component {
         SecureStore.getItemAsync('userinfo')
             .then((userdata) => {
                 let userinfo = JSON.parse(userdata);
-                console.log(userinfo);
                 if (userinfo) {
                     this.setState({username: userinfo.username});
                     this.setState({password: userinfo.password});
@@ -27,9 +26,6 @@ class Login extends Component {
             })
     }
 
-    componentWillUnmount(){
-        console.log('fuera')
-    }
     static navigationOptions = {
         title: 'Login',
     };
@@ -42,9 +38,9 @@ class Login extends Component {
         else{
             SecureStore.deleteItemAsync('userinfo')
                 .catch((error) => console.log('Could not delete user info', error));
-                this.setState({username: ''});
-                    this.setState({password: ''});
-                    this.setState({remember: false})
+                // this.setState({username: ''});
+                //     this.setState({password: ''});
+                //     this.setState({remember: false})
         }
     }
 
