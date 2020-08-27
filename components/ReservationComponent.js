@@ -103,7 +103,6 @@ async getDefaultCalendarSource() {
 }
 
 async addReservationToCalendar(date){
-  console.log();
   const startDate =Date.parse(date);
   const endDate = startDate + (2*60*60*1000);
   await this.obtainCalendarPermission();
@@ -129,7 +128,6 @@ async addReservationToCalendar(date){
       location:'121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong',
       timeZone: 'Asia/Hong_Kong'
     })
-  console.log(`Your new calendar ID is: ${newCalendarID}`);
 }
 
 handleReservation =() => {
