@@ -1,11 +1,13 @@
 import React, { Component, useState } from 'react';
-import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button,Modal, Alert } from 'react-native';
+import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button,Modal, Alert, Platform } from 'react-native';
 import { Card } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { onChange } from 'react-native-reanimated';
 import * as Animatable from 'react-native-animatable';
 import * as Permissions from 'expo-permissions';
 import * as Notifications from 'expo-notifications';
+import * as Calendar from 'expo-calendar';
+
 class Reservation extends Component{
     constructor(props) {
         super(props);
@@ -83,6 +85,53 @@ async presentLocalNotification(date) {
     this.setState({showModal: !this.state.showModal});
 }
 
+async obtainCalendarPermission() {
+  let permission = await Permissions.getAsync(Permissions.CALENDAR);
+  if (permission.status !== 'granted') {
+      permission = await Permissions.askAsync(Permissions.CALENDAR);
+      if (permission.status !== 'granted') {
+          Alert.alert('Permission not granted to use Calendar');
+      }
+  }
+  return permission;
+}
+
+async getDefaultCalendarSource() {
+  const calendars = await Calendar.getCalendarsAsync();
+  const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
+  return defaultCalendars[0].source;
+}
+
+async addReservationToCalendar(date){
+  console.log();
+  const startDate =Date.parse(date);
+  const endDate = startDate + (2*60*60*1000);
+  await this.obtainCalendarPermission();
+  const defaultCalendarSource =
+    Platform.OS === 'ios'
+      ? await getDefaultCalendarSource()
+      : { isLocalAccount: true, name: 'Expo Calendar' };
+  const newCalendarID = await Calendar.createCalendarAsync({
+    title: 'Expo Calendar',
+    color: 'blue',
+    entityType: Calendar.EntityTypes.EVENT,
+    sourceId: defaultCalendarSource.id,
+    source: defaultCalendarSource,
+    name: 'internalCalendarName',
+    ownerAccount: 'personal',
+    accessLevel: Calendar.CalendarAccessLevel.OWNER,
+  });
+  await Calendar.createEventAsync(newCalendarID,
+    {
+      title:'Con Fusion Table Reservation' ,
+      startDate:startDate,
+      endDate:endDate,
+      location:'121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong',
+      timeZone: 'Asia/Hong_Kong'
+    })
+  console.log(`Your new calendar ID is: ${newCalendarID}`);
+}
+
 handleReservation =() => {
   console.log(JSON.stringify(this.state));
     Alert.alert(
@@ -90,7 +139,7 @@ handleReservation =() => {
       'Number of Guests: '+this.state.guests +' \nSmoking? '+this.state.smoking+' \nDate and Time: '+this.state.date,
       [
       {text: 'Cancel', onPress: () => {console.log('Cancel Pressed');this.resetForm();}, style: 'cancel'},
-      {text: 'OK', onPress: () => {console.log('accept Pressed');this.presentLocalNotification(this.state.date);this.resetForm();}},
+      {text: 'OK', onPress: () => {console.log('accept Pressed');this.presentLocalNotification(this.state.date);this.resetForm();this.addReservationToCalendar(this.state.date)}},
       ],
       { cancelable: false }
   );
