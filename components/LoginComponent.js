@@ -4,6 +4,12 @@ import { Card, Icon, Input,Button, CheckBox } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
+import { Camera } from 'expo-camera';
+import { Asset } from 'expo-asset';
+import * as ImageManipulator from "expo-image-manipulator";
+
+
+
 import { createBottomTabNavigator }  from '@react-navigation/bottom-tabs';
 import { baseUrl } from '../shared/baseUrl';
 
@@ -130,6 +136,19 @@ class RegisterTab extends Component {
                 this.setState({imageUrl: capturedImage.uri });
             }
         }
+
+    }
+
+    processImage = async (imageUri) => {
+        let processedImage = await ImageManipulator.manipulate(
+            imageUri,
+            [
+                {resize: {width: 400}}
+            ],
+            {format: 'png'}
+        );
+        console.log(processedImage);
+        this.setState({imageUrl: processedImage.uri });
 
     }
 
